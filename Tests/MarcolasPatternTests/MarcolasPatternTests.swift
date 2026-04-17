@@ -17,7 +17,7 @@ let testMacros: [String: Macro.Type] = [
 
 final class MCViewModelMacroTests: XCTestCase {
 
-    func testGeneratesDataStructAndBridge() throws {
+    func testGeneratesDataStructAndProvider() throws {
         #if canImport(MarcolasPatternMacros)
         assertMacroExpansion(
             """
@@ -54,10 +54,11 @@ final class MCViewModelMacroTests: XCTestCase {
                     public let items: [Item]
                     @Binding public var searchText: String
                     public let filteredItems: [Item]
-                    public let deleteItem: (Item) -> Void
+                    public let deleteItem: @Sendable (Item) -> Void
                 }
 
-                struct _HomeViewModelBridge<Content: View>: View {
+                @propertyWrapper
+                struct _HomeViewModelProvider: DynamicProperty {
                     @Query var items: [Item]
 
                     @State var searchText: String = ""
@@ -74,9 +75,7 @@ final class MCViewModelMacroTests: XCTestCase {
                         modelContext.delete(item)
                     }
 
-                    let content: (HomeViewModelData) -> Content
-
-                    private var currentData: HomeViewModelData {
+                    var wrappedValue: HomeViewModelData {
                         HomeViewModelData(
                             items: items,
                             searchText: $searchText,
@@ -89,8 +88,8 @@ final class MCViewModelMacroTests: XCTestCase {
                         )
                     }
 
-                    var body: some View {
-                        content(currentData)
+                    var projectedValue: Self {
+                        self
                     }
                 }
             }
@@ -122,22 +121,21 @@ final class MCViewModelMacroTests: XCTestCase {
                     @Binding public var fontSize: Double
                 }
 
-                struct _SettingsViewModelBridge<Content: View>: View {
+                @propertyWrapper
+                struct _SettingsViewModelProvider: DynamicProperty {
                     @State var isDarkMode: Bool = false
 
                     @State var fontSize: Double = 14.0
 
-                    let content: (SettingsViewModelData) -> Content
-
-                    private var currentData: SettingsViewModelData {
+                    var wrappedValue: SettingsViewModelData {
                         SettingsViewModelData(
                             isDarkMode: $isDarkMode,
                             fontSize: $fontSize
                         )
                     }
 
-                    var body: some View {
-                        content(currentData)
+                    var projectedValue: Self {
+                        self
                     }
                 }
             }
@@ -167,17 +165,16 @@ final class MCViewModelMacroTests: XCTestCase {
                 }
 
                 public struct EditorViewModelData {
-                    public let updateItem: (Item, String) -> Void
+                    public let updateItem: @Sendable (Item, String) -> Void
                 }
 
-                struct _EditorViewModelBridge<Content: View>: View {
+                @propertyWrapper
+                struct _EditorViewModelProvider: DynamicProperty {
                     func updateItem(_ item: Item, newName: String) {
                         item.name = newName
                     }
 
-                    let content: (EditorViewModelData) -> Content
-
-                    private var currentData: EditorViewModelData {
+                    var wrappedValue: EditorViewModelData {
                         EditorViewModelData(
                             updateItem: { [self] item, newName in
                                 MainActor.assumeIsolated {
@@ -187,8 +184,8 @@ final class MCViewModelMacroTests: XCTestCase {
                         )
                     }
 
-                    var body: some View {
-                        content(currentData)
+                    var projectedValue: Self {
+                        self
                     }
                 }
             }
@@ -230,10 +227,11 @@ final class MCViewModelMacroTests: XCTestCase {
                 public struct FeedViewModelData {
                     @Binding public var items: [String]
                     @Binding public var isLoading: Bool
-                    public let loadItems: () async -> Void
+                    public let loadItems: @Sendable () async -> Void
                 }
 
-                struct _FeedViewModelBridge<Content: View>: View {
+                @propertyWrapper
+                struct _FeedViewModelProvider: DynamicProperty {
                     @State var items: [String] = []
 
                     @State var isLoading: Bool = false
@@ -244,9 +242,7 @@ final class MCViewModelMacroTests: XCTestCase {
                         isLoading = false
                     }
 
-                    let content: (FeedViewModelData) -> Content
-
-                    private var currentData: FeedViewModelData {
+                    var wrappedValue: FeedViewModelData {
                         FeedViewModelData(
                             items: $items,
                             isLoading: $isLoading,
@@ -256,8 +252,8 @@ final class MCViewModelMacroTests: XCTestCase {
                         )
                     }
 
-                    var body: some View {
-                        content(currentData)
+                    var projectedValue: Self {
+                        self
                     }
                 }
             }
@@ -292,19 +288,18 @@ final class MCViewModelMacroTests: XCTestCase {
 
                 public struct HomeViewModelData {
                     public let repository: TodoRepository
-                    public let load: () async -> Void
+                    public let load: @Sendable () async -> Void
                 }
 
-                struct _HomeViewModelBridge<Content: View>: View {
+                @propertyWrapper
+                struct _HomeViewModelProvider: DynamicProperty {
                     let repository: TodoRepository = TodoRepository()
 
                     func load() async {
                         await repository.fetch()
                     }
 
-                    let content: (HomeViewModelData) -> Content
-
-                    private var currentData: HomeViewModelData {
+                    var wrappedValue: HomeViewModelData {
                         HomeViewModelData(
                             repository: repository,
                             load: { [self] in
@@ -313,8 +308,8 @@ final class MCViewModelMacroTests: XCTestCase {
                         )
                     }
 
-                    var body: some View {
-                        content(currentData)
+                    var projectedValue: Self {
+                        self
                     }
                 }
             }
@@ -349,19 +344,18 @@ final class MCViewModelMacroTests: XCTestCase {
 
                 public struct HomeViewModelData {
                     public let repository: TodoRepository
-                    public let load: () async -> Void
+                    public let load: @Sendable () async -> Void
                 }
 
-                struct _HomeViewModelBridge<Content: View>: View {
+                @propertyWrapper
+                struct _HomeViewModelProvider: DynamicProperty {
                     let repository = TodoRepository()
 
                     func load() async {
                         await repository.fetch()
                     }
 
-                    let content: (HomeViewModelData) -> Content
-
-                    private var currentData: HomeViewModelData {
+                    var wrappedValue: HomeViewModelData {
                         HomeViewModelData(
                             repository: repository,
                             load: { [self] in
@@ -370,8 +364,8 @@ final class MCViewModelMacroTests: XCTestCase {
                         )
                     }
 
-                    var body: some View {
-                        content(currentData)
+                    var projectedValue: Self {
+                        self
                     }
                 }
             }
@@ -412,32 +406,24 @@ final class MCViewModelMacroTests: XCTestCase {
 
 final class MCViewMacroTests: XCTestCase {
 
-    func testGeneratesBodyWithBridge() throws {
+    func testGeneratesDataProperty() throws {
         #if canImport(MarcolasPatternMacros)
         assertMacroExpansion(
             """
             @MCView(HomeViewModel.self)
-            struct HomeView {
-                @ViewBuilder
-                func ui(data: HomeViewModelData) -> some View {
+            struct HomeView: View {
+                var body: some View {
                     Text("Hello")
                 }
             }
             """,
             expandedSource: """
-            struct HomeView {
-                @ViewBuilder
-                func ui(data: HomeViewModelData) -> some View {
+            struct HomeView: View {
+                var body: some View {
                     Text("Hello")
                 }
-            }
 
-            extension HomeView: View {
-                var body: some View {
-                    HomeViewModel._HomeViewModelBridge { data in
-                        ui(data: data)
-                    }
-                }
+                @HomeViewModel._HomeViewModelProvider var data
             }
             """,
             macros: testMacros
