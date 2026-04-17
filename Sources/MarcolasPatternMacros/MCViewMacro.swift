@@ -22,9 +22,10 @@ public struct MCViewMacro: MemberMacro {
 
         let viewModelName = extractViewModelName(from: node)
         let providerName = "_\(viewModelName)Provider"
+        let dataName = "\(viewModelName)Data"
 
         let member: DeclSyntax = """
-        @\(raw: viewModelName).\(raw: providerName) var data
+        @\(raw: viewModelName).\(raw: providerName) var data: \(raw: viewModelName).\(raw: dataName)
         """
 
         return [member]
