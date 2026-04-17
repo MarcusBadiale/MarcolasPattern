@@ -54,7 +54,7 @@ final class MCViewModelMacroTests: XCTestCase {
                     public let items: [Item]
                     @Binding public var searchText: String
                     public let filteredItems: [Item]
-                    public let deleteItem: @Sendable (Item) -> Void
+                    public let deleteItem: (Item) -> Void
                 }
 
                 @propertyWrapper
@@ -81,9 +81,7 @@ final class MCViewModelMacroTests: XCTestCase {
                             searchText: $searchText,
                             filteredItems: filteredItems,
                             deleteItem: { [self] item in
-                                MainActor.assumeIsolated {
-                                    self.deleteItem(item)
-                                }
+                                self.deleteItem(item)
                             }
                         )
                     }
@@ -165,7 +163,7 @@ final class MCViewModelMacroTests: XCTestCase {
                 }
 
                 public struct EditorViewModelData {
-                    public let updateItem: @Sendable (Item, String) -> Void
+                    public let updateItem: (Item, String) -> Void
                 }
 
                 @propertyWrapper
@@ -177,9 +175,7 @@ final class MCViewModelMacroTests: XCTestCase {
                     var wrappedValue: EditorViewModelData {
                         EditorViewModelData(
                             updateItem: { [self] item, newName in
-                                MainActor.assumeIsolated {
-                                    self.updateItem(item, newName: newName)
-                                }
+                                self.updateItem(item, newName: newName)
                             }
                         )
                     }
@@ -423,7 +419,7 @@ final class MCViewMacroTests: XCTestCase {
                     Text("Hello")
                 }
 
-                @HomeViewModel._HomeViewModelProvider var data
+                @HomeViewModel._HomeViewModelProvider var data: HomeViewModel.HomeViewModelData
             }
             """,
             macros: testMacros

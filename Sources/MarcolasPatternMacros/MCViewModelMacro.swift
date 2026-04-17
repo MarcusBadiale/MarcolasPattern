@@ -195,7 +195,8 @@ private func closureType(for func_: ClassifiedFunction) -> String {
     var modifiers = ""
     if func_.isAsync { modifiers += " async" }
     if func_.isThrows { modifiers += " throws" }
-    return "@Sendable (\(paramsStr))\(modifiers) -> \(returnStr)"
+    let sendable = func_.isAsync ? "@Sendable " : ""
+    return "\(sendable)(\(paramsStr))\(modifiers) -> \(returnStr)"
 }
 
 private func closureWrapper(for func_: ClassifiedFunction) -> String {
@@ -215,18 +216,8 @@ private func closureWrapper(for func_: ClassifiedFunction) -> String {
     let args = callArgs.joined(separator: ", ")
     let call = "\(prefix)self.\(func_.name)(\(args))"
 
-    // Async functions don't need MainActor.assumeIsolated — the `await`
-    // handles actor hopping automatically. Sync functions do need it
-    // because MainActor.assumeIsolated doesn't accept async closures.
-    if func_.isAsync {
-        if paramNames.isEmpty {
-            return "{ [self] in \(call) }"
-        }
-        return "{ [self] \(params) in \(call) }"
-    }
-
     if paramNames.isEmpty {
-        return "{ [self] in MainActor.assumeIsolated { \(call) } }"
+        return "{ [self] in \(call) }"
     }
-    return "{ [self] \(params) in MainActor.assumeIsolated { \(call) } }"
+    return "{ [self] \(params) in \(call) }"
 }
