@@ -22,7 +22,7 @@ public struct MCViewModelMacro: MemberMacro {
 
         let structName = structDecl.name.trimmedDescription
         let dataName = "\(structName)Data"
-        let bridgeName = "_\(structName)Bridge"
+        let providerName = "_\(structName)Provider"
 
         let classified = classifyMembers(structDecl)
 
@@ -35,8 +35,8 @@ public struct MCViewModelMacro: MemberMacro {
             functions: classified.functions
         )
 
-        let bridge = generateBridge(
-            bridgeName: bridgeName,
+        let provider = generateProvider(
+            providerName: providerName,
             dataName: dataName,
             queryProps: classified.query,
             stateProps: classified.state,
@@ -46,7 +46,7 @@ public struct MCViewModelMacro: MemberMacro {
             functions: classified.functions
         )
 
-        return [dataStruct, bridge]
+        return [dataStruct, provider]
     }
 }
 
@@ -117,10 +117,10 @@ private func generateDataStruct(
     """
 }
 
-// MARK: - Bridge Generation
+// MARK: - Provider Generation (DynamicProperty)
 
-private func generateBridge(
-    bridgeName: String,
+private func generateProvider(
+    providerName: String,
     dataName: String,
     queryProps: [ClassifiedProperty],
     stateProps: [ClassifiedProperty],
@@ -150,8 +150,6 @@ private func generateBridge(
         lines.append("    \(func_.originalSource)")
     }
 
-    lines.append("    let content: (\(dataName)) -> Content")
-
     var assignments: [String] = []
     for prop in queryProps {
         assignments.append("            \(prop.name): \(prop.name)")
@@ -170,23 +168,20 @@ private func generateBridge(
     }
 
     lines.append("""
-        private var currentData: \(dataName) {
+        var wrappedValue: \(dataName) {
             \(dataName)(
     \(assignments.joined(separator: ",\n"))
             )
         }
     """)
 
-    lines.append("""
-        var body: some View {
-            content(currentData)
-        }
-    """)
+    lines.append("    var projectedValue: Self { self }")
 
     let body = lines.joined(separator: "\n\n")
 
     return """
-    struct \(raw: bridgeName)<Content: View>: View {
+    @propertyWrapper
+    struct \(raw: providerName): DynamicProperty {
     \(raw: body)
     }
     """
@@ -200,7 +195,7 @@ private func closureType(for func_: ClassifiedFunction) -> String {
     var modifiers = ""
     if func_.isAsync { modifiers += " async" }
     if func_.isThrows { modifiers += " throws" }
-    return "(\(paramsStr))\(modifiers) -> \(returnStr)"
+    return "@Sendable (\(paramsStr))\(modifiers) -> \(returnStr)"
 }
 
 private func closureWrapper(for func_: ClassifiedFunction) -> String {

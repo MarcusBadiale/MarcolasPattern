@@ -5,42 +5,29 @@
 //  Created by Marcus Badiale on 16/04/26.
 //
 
-// Sources/MarcolasPatternMacros/MCViewMacro.swift
-
 import SwiftSyntax
 import SwiftSyntaxMacros
 import SwiftSyntaxBuilder
 
-public struct MCViewMacro: ExtensionMacro {
+public struct MCViewMacro: MemberMacro {
     public static func expansion(
         of node: AttributeSyntax,
-        attachedTo declaration: some DeclGroupSyntax,
-        providingExtensionsOf type: some TypeSyntaxProtocol,
+        providingMembersOf declaration: some DeclGroupSyntax,
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
-    ) throws -> [ExtensionDeclSyntax] {
+    ) throws -> [DeclSyntax] {
         guard declaration.as(StructDeclSyntax.self) != nil else {
             throw MacroError.message("@MCView can only be applied to a struct")
         }
 
         let viewModelName = extractViewModelName(from: node)
-        let bridgeName = "\(viewModelName)._\(viewModelName)Bridge"
+        let providerName = "_\(viewModelName)Provider"
 
-        let ext: DeclSyntax = """
-        extension \(type.trimmed): View {
-            var body: some View {
-                \(raw: bridgeName) { data in
-                    ui(data: data)
-                }
-            }
-        }
+        let member: DeclSyntax = """
+        @\(raw: viewModelName).\(raw: providerName) var data
         """
 
-        guard let extensionDecl = ext.as(ExtensionDeclSyntax.self) else {
-            return []
-        }
-
-        return [extensionDecl]
+        return [member]
     }
 
     private static func extractViewModelName(from node: AttributeSyntax) -> String {

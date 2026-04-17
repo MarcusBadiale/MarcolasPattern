@@ -11,16 +11,15 @@ import SwiftUI
 // MARK: - @MCViewModel
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/// Separates logic from UI using a generated Bridge View.
+/// Separates logic from UI using a generated DynamicProperty provider.
 ///
 /// The developer writes a plain struct with @Query, @State, @Environment,
 /// computed properties, and functions. The macro generates:
 ///
 /// 1. **`<Name>Data`** — a struct with lets, @Bindings, and closures
-/// 2. **`_<Name>Bridge<Content: View>`** — a generic View that holds all
-///    the property wrappers (so @Query works) and renders the Content
-///    closure with the Data. Zero AnyView — the concrete type flows through.
-/// 3. **`currentData`** — computed property that packs everything into Data
+/// 2. **`_<Name>Provider`** — a `@propertyWrapper` conforming to `DynamicProperty`
+///    that holds all the property wrappers and exposes Data as its `wrappedValue`.
+///    SwiftUI automatically tracks @Query/@State/@Environment changes.
 ///
 /// ```swift
 /// @MCViewModel
@@ -43,13 +42,15 @@ public macro MCViewModel() = #externalMacro(
 // MARK: - @MCView
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/// Generates View conformance that wires the Bridge to the developer's `ui` function.
+/// Injects a `data` property backed by the ViewModel's DynamicProperty provider.
+///
+/// The developer writes `body` normally and accesses `data` to get the ViewModel's
+/// Data struct. No Bridge View, no `ui(data:)` function needed.
 ///
 /// ```swift
 /// @MCView(HomeViewModel.self)
-/// struct HomeView {
-///     @ViewBuilder
-///     func ui(data: HomeViewModelData) -> some View {
+/// struct HomeView: View {
+///     var body: some View {
 ///         List(data.filteredRecipes) { recipe in
 ///             Text(recipe.name)
 ///         }
@@ -60,15 +61,9 @@ public macro MCViewModel() = #externalMacro(
 ///
 /// Generates:
 /// ```swift
-/// extension HomeView: View {
-///     var body: some View {
-///         _HomeViewModelBridge { data in
-///             ui(data: data)
-///         }
-///     }
-/// }
+/// @HomeViewModel._HomeViewModelProvider var data
 /// ```
-@attached(extension, conformances: View, names: arbitrary)
+@attached(member, names: named(data))
 public macro MCView<T>(_ viewModel: T.Type) = #externalMacro(
     module: "MarcolasPatternMacros",
     type: "MCViewMacro"

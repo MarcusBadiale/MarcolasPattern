@@ -2,9 +2,8 @@ import MarcolasPattern
 import SwiftUI
 
 @MCView(TodoListViewModel.self)
-struct TodoListView {
-    @ViewBuilder
-    func ui(data: TodoListViewModel.TodoListViewModelData) -> some View {
+struct TodoListView: View {
+    var body: some View {
         NavigationStack {
             List {
                 Section {
