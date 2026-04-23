@@ -117,12 +117,17 @@ struct PropertyClassifier {
         let wrapperName = findPropertyWrapper(in: attributes)
 
         // @Environment often omits type annotations (e.g. @Environment(\.modelContext) var modelContext).
-        // The Bridge only needs originalSource for these, so a placeholder type is fine.
+        // When a metatype argument is present (e.g. @Environment(Navigator.self)), we extract the type.
+        // Otherwise a placeholder type is used — the Bridge only needs originalSource for these.
         let type: TypeSyntax
         if let explicitType = binding.typeAnnotation?.type {
             type = explicitType
         } else if wrapperName == "Environment" {
-            type = TypeSyntax(IdentifierTypeSyntax(name: .identifier("Any")))
+            if let metatype = extractTypeFromEnvironmentMetatype(in: attributes) {
+                type = metatype
+            } else {
+                type = TypeSyntax(IdentifierTypeSyntax(name: .identifier("Any")))
+            }
         } else if let inferred = inferType(from: binding) {
             type = inferred
         } else {
@@ -171,6 +176,27 @@ struct PropertyClassifier {
                 if knownWrappers.contains(name) {
                     return name
                 }
+            }
+        }
+        return nil
+    }
+
+    /// Extracts the type from `@Environment(Type.self)` metatype arguments.
+    /// Returns `nil` for key-path arguments like `@Environment(\.keyPath)`.
+    private static func extractTypeFromEnvironmentMetatype(in attributes: AttributeListSyntax) -> TypeSyntax? {
+        for attribute in attributes {
+            guard let attr = attribute.as(AttributeSyntax.self),
+                  let identType = attr.attributeName.as(IdentifierTypeSyntax.self),
+                  identType.name.trimmedDescription == "Environment" else { continue }
+
+            // Match @Environment(Type.self) pattern
+            if let arguments = attr.arguments?.as(LabeledExprListSyntax.self),
+               let firstArg = arguments.first,
+               let memberAccess = firstArg.expression.as(MemberAccessExprSyntax.self),
+               memberAccess.declName.baseName.trimmedDescription == "self",
+               let base = memberAccess.base?.as(DeclReferenceExprSyntax.self) {
+                let typeName = base.baseName.trimmedDescription
+                return TypeSyntax(IdentifierTypeSyntax(name: .identifier(typeName)))
             }
         }
         return nil

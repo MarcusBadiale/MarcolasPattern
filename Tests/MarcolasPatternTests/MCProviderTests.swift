@@ -520,6 +520,146 @@ final class MCProviderTests: XCTestCase {
         #endif
     }
 
+    func testEnvironmentMetatypeWithFunction() throws {
+        #if canImport(MarcolasPatternMacros)
+        assertMacroExpansion(
+            """
+            @MCProvider
+            struct CategoriesProvider {
+                @Environment(Navigator.self) var navigator
+
+                func navigateToDetail(_ category: String) {
+                    navigator.push(category)
+                }
+            }
+            """,
+            expandedSource: """
+            struct CategoriesProvider {
+                @Environment(Navigator.self) var navigator
+
+                func navigateToDetail(_ category: String) {
+                    navigator.push(category)
+                }
+
+                /// Auto-generated data for `CategoriesProvider`.
+                public struct CategoriesData: CustomDebugStringConvertible {
+                    public let navigateToDetail: (String) -> Void
+                    public var debugDescription: String {
+                        "CategoriesData(navigateToDetail: (closure))"
+                    }
+                }
+
+                @MainActor @propertyWrapper
+                struct _DataWrapper: DynamicProperty {
+                    @Environment(Navigator.self) var navigator
+
+                    func navigateToDetail(_ category: String) {
+                        navigator.push(category)
+                    }
+
+                    var wrappedValue: CategoriesData {
+                        CategoriesData(
+                            navigateToDetail: { [self] category in
+                                self.navigateToDetail(category)
+                            }
+                        )
+                    }
+
+                    var projectedValue: Self {
+                        self
+                    }
+                }
+
+                struct Mock {
+                    var navigator: Navigator
+
+                    mutating func navigateToDetail(_ category: String) {
+                        navigator.push(category)
+                    }
+
+                    init(navigator: Navigator) {
+                        self.navigator = navigator
+                    }
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #else
+        throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    func testEnvironmentKeyPathWithAnnotationAndFunction() throws {
+        #if canImport(MarcolasPatternMacros)
+        assertMacroExpansion(
+            """
+            @MCProvider
+            struct CategoriesProvider {
+                @Environment(\\.navigator) var navigator: Navigator
+
+                func navigateToDetail(_ category: String) {
+                    navigator.push(category)
+                }
+            }
+            """,
+            expandedSource: """
+            struct CategoriesProvider {
+                @Environment(\\.navigator) var navigator: Navigator
+
+                func navigateToDetail(_ category: String) {
+                    navigator.push(category)
+                }
+
+                /// Auto-generated data for `CategoriesProvider`.
+                public struct CategoriesData: CustomDebugStringConvertible {
+                    public let navigateToDetail: (String) -> Void
+                    public var debugDescription: String {
+                        "CategoriesData(navigateToDetail: (closure))"
+                    }
+                }
+
+                @MainActor @propertyWrapper
+                struct _DataWrapper: DynamicProperty {
+                    @Environment(\\.navigator) var navigator: Navigator
+
+                    func navigateToDetail(_ category: String) {
+                        navigator.push(category)
+                    }
+
+                    var wrappedValue: CategoriesData {
+                        CategoriesData(
+                            navigateToDetail: { [self] category in
+                                self.navigateToDetail(category)
+                            }
+                        )
+                    }
+
+                    var projectedValue: Self {
+                        self
+                    }
+                }
+
+                struct Mock {
+                    var navigator: Navigator
+
+                    mutating func navigateToDetail(_ category: String) {
+                        navigator.push(category)
+                    }
+
+                    init(navigator: Navigator) {
+                        self.navigator = navigator
+                    }
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #else
+        throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
     func testEmptyProvider() throws {
         #if canImport(MarcolasPatternMacros)
         assertMacroExpansion(
