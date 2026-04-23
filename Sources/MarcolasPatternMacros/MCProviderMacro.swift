@@ -152,7 +152,11 @@ private func generateDataStruct(
     var debugParts: [String] = []
     let allProps = queryProps + stateProps + bindableProps + computedProps + regularProps
     for prop in allProps {
-        debugParts.append("\(prop.name): \\(\(prop.name))")
+        if prop.type.is(OptionalTypeSyntax.self) || prop.type.is(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
+            debugParts.append("\(prop.name): \\(String(describing: \(prop.name)))")
+        } else {
+            debugParts.append("\(prop.name): \\(\(prop.name))")
+        }
     }
     for func_ in functions {
         debugParts.append("\(func_.name): (closure)")
