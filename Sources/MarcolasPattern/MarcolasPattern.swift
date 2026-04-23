@@ -47,6 +47,9 @@ public macro MCProvider() = #externalMacro(
 /// The developer writes `body` normally and accesses `data` to get the Provider's
 /// Data struct. No Bridge View, no `ui(data:)` function needed.
 ///
+/// The macro generates both the `data` property and a default `init()`.
+/// If the Provider has no dependencies, zero boilerplate is needed:
+///
 /// ```swift
 /// @MCView(HomeProvider.self)
 /// struct HomeView: View {
@@ -59,11 +62,21 @@ public macro MCProvider() = #externalMacro(
 /// }
 /// ```
 ///
-/// Generates:
+/// If the Provider has dependencies (e.g. `let habitID: UUID`), the generated
+/// `init()` won't compile — the compiler will tell you exactly which parameters
+/// are missing. In that case, write your own init and the macro will skip generation:
+///
 /// ```swift
-/// @HomeProvider._DataWrapper var data
+/// @MCView(HabitDetailProvider.self)
+/// struct HabitDetailView: View {
+///     init(habitID: UUID) {
+///         self._data = .init(habitID: habitID)
+///     }
+///
+///     var body: some View { ... }
+/// }
 /// ```
-@attached(member, names: named(data))
+@attached(member, names: named(data), named(init))
 public macro MCView<T>(_ viewModel: T.Type) = #externalMacro(
     module: "MarcolasPatternMacros",
     type: "MCViewMacro"

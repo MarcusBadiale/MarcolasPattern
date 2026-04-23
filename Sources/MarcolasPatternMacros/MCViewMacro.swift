@@ -30,7 +30,22 @@ public struct MCViewMacro: MemberMacro {
         @\(raw: structName)._DataWrapper var data: \(raw: structName).\(raw: dataName)
         """
 
-        return [member]
+        var members: [DeclSyntax] = [member]
+
+        let hasUserInit = declaration.memberBlock.members.contains { member in
+            member.decl.as(InitializerDeclSyntax.self) != nil
+        }
+
+        if !hasUserInit {
+            let initDecl: DeclSyntax = """
+            init() {
+                self._data = .init()
+            }
+            """
+            members.append(initDecl)
+        }
+
+        return members
     }
 
     private static func extractStructName(from node: AttributeSyntax) -> String {
