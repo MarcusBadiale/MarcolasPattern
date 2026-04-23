@@ -25,7 +25,7 @@ final class MCViewMacroTests: XCTestCase {
                     Text("Hello")
                 }
 
-                @HomeProvider._DataWrapper var data
+                @HomeProvider._DataWrapper var data: HomeProvider.HomeData
             }
             """,
             macros: testMacros

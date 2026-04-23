@@ -21,9 +21,13 @@ public struct MCViewMacro: MemberMacro {
         }
 
         let structName = extractStructName(from: node)
+        let baseName = structName.hasSuffix("Provider")
+            ? String(structName.dropLast("Provider".count))
+            : structName
+        let dataName = "\(baseName)Data"
 
         let member: DeclSyntax = """
-        @\(raw: structName)._DataWrapper var data
+        @\(raw: structName)._DataWrapper var data: \(raw: structName).\(raw: dataName)
         """
 
         return [member]
