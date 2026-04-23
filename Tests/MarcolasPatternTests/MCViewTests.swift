@@ -25,7 +25,46 @@ final class MCViewMacroTests: XCTestCase {
                     Text("Hello")
                 }
 
-                @HomeProvider._DataWrapper var data
+                @HomeProvider._DataWrapper var data: HomeProvider.HomeData
+
+                init() {
+                    self._data = .init()
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #else
+        throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    func testSkipsInitWhenUserProvidesOne() throws {
+        #if canImport(MarcolasPatternMacros)
+        assertMacroExpansion(
+            """
+            @MCView(HabitDetailProvider.self)
+            struct HabitDetailView: View {
+                init(habitID: UUID) {
+                    self._data = .init(habitID: habitID)
+                }
+
+                var body: some View {
+                    Text("Detail")
+                }
+            }
+            """,
+            expandedSource: """
+            struct HabitDetailView: View {
+                init(habitID: UUID) {
+                    self._data = .init(habitID: habitID)
+                }
+
+                var body: some View {
+                    Text("Detail")
+                }
+
+                @HabitDetailProvider._DataWrapper var data: HabitDetailProvider.HabitDetailData
             }
             """,
             macros: testMacros
