@@ -11,19 +11,32 @@
 		A1B2C3D400000003 /* MarcolasPattern in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D400000004 /* MarcolasPattern */; };
 		A1B2C3D400000020 /* Todo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000021 /* Todo.swift */; };
 		A1B2C3D400000022 /* TodoRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000023 /* TodoRepository.swift */; };
-		A1B2C3D400000024 /* TodoListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000025 /* TodoListViewModel.swift */; };
+		A1B2C3D400000024 /* TodoListProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000025 /* TodoListProvider.swift */; };
 		A1B2C3D400000026 /* TodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000027 /* TodoListView.swift */; };
 		A1B2C3D400000028 /* TodoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000029 /* TodoRow.swift */; };
+		B1B2C3D400000001 /* TodoListProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2C3D400000002 /* TodoListProviderTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B1B2C3D400000010 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1B2C3D40000000D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1B2C3D40000000A;
+			remoteInfo = MarcolasPatternExample;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A1B2C3D400000002 /* MarcolasPatternExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarcolasPatternExampleApp.swift; sourceTree = "<group>"; };
 		A1B2C3D400000005 /* MarcolasPatternExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarcolasPatternExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D400000021 /* Todo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Todo.swift; sourceTree = "<group>"; };
 		A1B2C3D400000023 /* TodoRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoRepository.swift; sourceTree = "<group>"; };
-		A1B2C3D400000025 /* TodoListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D400000025 /* TodoListProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListProvider.swift; sourceTree = "<group>"; };
 		A1B2C3D400000027 /* TodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListView.swift; sourceTree = "<group>"; };
 		A1B2C3D400000029 /* TodoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoRow.swift; sourceTree = "<group>"; };
+		B1B2C3D400000002 /* TodoListProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListProviderTests.swift; sourceTree = "<group>"; };
+		B1B2C3D400000003 /* MarcolasPatternExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarcolasPatternExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +48,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B1B2C3D400000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -42,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D400000008 /* MarcolasPatternExample */,
+				B1B2C3D400000004 /* MarcolasPatternExampleTests */,
 				A1B2C3D400000009 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,7 +73,7 @@
 				A1B2C3D400000002 /* MarcolasPatternExampleApp.swift */,
 				A1B2C3D400000021 /* Todo.swift */,
 				A1B2C3D400000023 /* TodoRepository.swift */,
-				A1B2C3D400000025 /* TodoListViewModel.swift */,
+				A1B2C3D400000025 /* TodoListProvider.swift */,
 				A1B2C3D400000027 /* TodoListView.swift */,
 				A1B2C3D400000029 /* TodoRow.swift */,
 			);
@@ -63,8 +84,17 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D400000005 /* MarcolasPatternExample.app */,
+				B1B2C3D400000003 /* MarcolasPatternExampleTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B1B2C3D400000004 /* MarcolasPatternExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				B1B2C3D400000002 /* TodoListProviderTests.swift */,
+			);
+			path = MarcolasPatternExampleTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -88,6 +118,23 @@
 			productName = MarcolasPatternExample;
 			productReference = A1B2C3D400000005 /* MarcolasPatternExample.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B1B2C3D40000000A /* MarcolasPatternExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B1B2C3D40000000B /* Build configuration list for PBXNativeTarget "MarcolasPatternExampleTests" */;
+			buildPhases = (
+				B1B2C3D40000000C /* Sources */,
+				B1B2C3D400000006 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B1B2C3D400000011 /* PBXTargetDependency */,
+			);
+			name = MarcolasPatternExampleTests;
+			productName = MarcolasPatternExampleTests;
+			productReference = B1B2C3D400000003 /* MarcolasPatternExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -116,6 +163,7 @@
 			projectRoot = "";
 			targets = (
 				A1B2C3D40000000A /* MarcolasPatternExample */,
+				B1B2C3D40000000A /* MarcolasPatternExampleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -128,13 +176,29 @@
 				A1B2C3D400000001 /* MarcolasPatternExampleApp.swift in Sources */,
 				A1B2C3D400000020 /* Todo.swift in Sources */,
 				A1B2C3D400000022 /* TodoRepository.swift in Sources */,
-				A1B2C3D400000024 /* TodoListViewModel.swift in Sources */,
+				A1B2C3D400000024 /* TodoListProvider.swift in Sources */,
 				A1B2C3D400000026 /* TodoListView.swift in Sources */,
 				A1B2C3D400000028 /* TodoRow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B1B2C3D40000000C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B2C3D400000001 /* TodoListProviderTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B1B2C3D400000011 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A1B2C3D40000000A /* MarcolasPatternExample */;
+			targetProxy = B1B2C3D400000010 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A1B2C3D400000010 /* Debug */ = {
@@ -228,6 +292,46 @@
 			};
 			name = Release;
 		};
+		B1B2C3D400000012 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.MarcolasPatternExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MarcolasPatternExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MarcolasPatternExample";
+			};
+			name = Debug;
+		};
+		B1B2C3D400000013 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.MarcolasPatternExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MarcolasPatternExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MarcolasPatternExample";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -245,6 +349,15 @@
 			buildConfigurations = (
 				A1B2C3D400000012 /* Debug */,
 				A1B2C3D400000013 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B1B2C3D40000000B /* Build configuration list for PBXNativeTarget "MarcolasPatternExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B1B2C3D400000012 /* Debug */,
+				B1B2C3D400000013 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

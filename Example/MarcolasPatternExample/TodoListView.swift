@@ -1,7 +1,7 @@
 import MarcolasPattern
 import SwiftUI
 
-@MCView(TodoListViewModel.self)
+@MCView(TodoListProvider.self)
 struct TodoListView: View {
     var body: some View {
         NavigationStack {
