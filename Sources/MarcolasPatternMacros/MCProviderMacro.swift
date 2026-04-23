@@ -306,10 +306,10 @@ private func generateMock(
         initBody.append("        self.\(prop.name) = \(prop.name)")
     }
 
-    // @Environment → var, required in init (only if explicitly typed)
+    // @Environment → var, required in init (only if type is known — from annotation or metatype extraction)
     for prop in environmentProps {
-        guard prop.binding.typeAnnotation != nil else { continue }
         let typeStr = prop.type.trimmedDescription
+        guard typeStr != "Any" else { continue }
         members.append("    var \(prop.name): \(typeStr)")
         requiredParams.append("\(prop.name): \(typeStr)")
         initBody.append("        self.\(prop.name) = \(prop.name)")
