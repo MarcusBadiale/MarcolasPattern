@@ -23,9 +23,10 @@ let package = Package(
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
             ]
         ),
-        // The public library that exposes @MCViewModel and @MCView
+        // The public library that exposes @MCProvider and @MCView
         .target(
             name: "MarcolasPattern",
             dependencies: ["MarcolasPatternMacros"]

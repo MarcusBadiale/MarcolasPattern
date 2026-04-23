@@ -13,8 +13,24 @@ enum PropertyKind {
     case query
     case state
     case environment
+    case bindable
     case computed
     case regular
+}
+
+// MARK: - Skip Reasons
+
+enum PropertySkipReason {
+    case noTypeAnnotationOrInferrable
+    case computedWithoutType
+    case unsupportedPattern
+}
+
+// MARK: - Classification Result
+
+enum ClassificationResult {
+    case classified(ClassifiedProperty)
+    case skipped(name: String, reason: PropertySkipReason, node: Syntax)
 }
 
 // MARK: - Classified Property
@@ -52,11 +68,16 @@ struct ClassifiedFunction {
 
 struct PropertyClassifier {
 
-    static func classify(member: MemberBlockItemSyntax) -> ClassifiedProperty? {
-        guard let varDecl = member.decl.as(VariableDeclSyntax.self),
-              let binding = varDecl.bindings.first,
-              let pattern = binding.pattern.as(IdentifierPatternSyntax.self)
-        else { return nil }
+    static func classify(member: MemberBlockItemSyntax) -> ClassificationResult? {
+        guard let varDecl = member.decl.as(VariableDeclSyntax.self) else {
+            return nil // Not a variable declaration — no diagnostic needed
+        }
+
+        guard let binding = varDecl.bindings.first,
+              let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
+            let name = varDecl.bindings.first?.pattern.trimmedDescription ?? "unknown"
+            return .skipped(name: name, reason: .unsupportedPattern, node: Syntax(varDecl))
+        }
 
         let name = pattern.identifier.trimmedDescription
         let attributes = varDecl.attributes
@@ -64,27 +85,31 @@ struct PropertyClassifier {
         // Computed property detection
         if let accessorBlock = binding.accessorBlock {
             if case .getter = accessorBlock.accessors {
-                guard let type = binding.typeAnnotation?.type else { return nil }
-                return ClassifiedProperty(
+                guard let type = binding.typeAnnotation?.type else {
+                    return .skipped(name: name, reason: .computedWithoutType, node: Syntax(varDecl))
+                }
+                return .classified(ClassifiedProperty(
                     kind: .computed,
                     name: name,
                     type: type,
                     binding: binding,
                     fullDecl: varDecl
-                )
+                ))
             }
             if case let .accessors(accessorList) = accessorBlock.accessors {
                 let kinds = accessorList.map { $0.accessorSpecifier.trimmedDescription }
                 if kinds.contains("get") && !kinds.contains("set") &&
                    !kinds.contains("willSet") && !kinds.contains("didSet") {
-                    guard let type = binding.typeAnnotation?.type else { return nil }
-                    return ClassifiedProperty(
+                    guard let type = binding.typeAnnotation?.type else {
+                        return .skipped(name: name, reason: .computedWithoutType, node: Syntax(varDecl))
+                    }
+                    return .classified(ClassifiedProperty(
                         kind: .computed,
                         name: name,
                         type: type,
                         binding: binding,
                         fullDecl: varDecl
-                    )
+                    ))
                 }
             }
         }
@@ -101,7 +126,7 @@ struct PropertyClassifier {
         } else if let inferred = inferType(from: binding) {
             type = inferred
         } else {
-            return nil
+            return .skipped(name: name, reason: .noTypeAnnotationOrInferrable, node: Syntax(varDecl))
         }
 
         let kind: PropertyKind
@@ -109,16 +134,17 @@ struct PropertyClassifier {
         case "Query": kind = .query
         case "State": kind = .state
         case "Environment": kind = .environment
+        case "Bindable": kind = .bindable
         default: kind = .regular
         }
 
-        return ClassifiedProperty(
+        return .classified(ClassifiedProperty(
             kind: kind,
             name: name,
             type: type,
             binding: binding,
             fullDecl: varDecl
-        )
+        ))
     }
 
     static func classifyFunction(member: MemberBlockItemSyntax) -> ClassifiedFunction? {
@@ -137,7 +163,7 @@ struct PropertyClassifier {
     // MARK: - Helpers
 
     private static func findPropertyWrapper(in attributes: AttributeListSyntax) -> String? {
-        let knownWrappers: Set<String> = ["Query", "State", "Environment"]
+        let knownWrappers: Set<String> = ["Query", "State", "Environment", "Bindable"]
         for attribute in attributes {
             if let attr = attribute.as(AttributeSyntax.self),
                let identType = attr.attributeName.as(IdentifierTypeSyntax.self) {
@@ -152,9 +178,29 @@ struct PropertyClassifier {
 
     /// Tries to infer the type from the initializer expression.
     /// Handles patterns like `let x = Foo()`, `let x = Foo.init()`,
-    /// `let x = Foo(arg: val)`, and `let x = Foo.shared`.
+    /// `let x = Foo(arg: val)`, `let x = Foo.shared`, and common literals.
     private static func inferType(from binding: PatternBindingSyntax) -> TypeSyntax? {
         guard let initializer = binding.initializer?.value else { return nil }
+
+        // Integer literal → Int
+        if initializer.is(IntegerLiteralExprSyntax.self) {
+            return TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int")))
+        }
+
+        // Float literal → Double
+        if initializer.is(FloatLiteralExprSyntax.self) {
+            return TypeSyntax(IdentifierTypeSyntax(name: .identifier("Double")))
+        }
+
+        // String literal → String
+        if initializer.is(StringLiteralExprSyntax.self) {
+            return TypeSyntax(IdentifierTypeSyntax(name: .identifier("String")))
+        }
+
+        // Boolean literal → Bool
+        if initializer.is(BooleanLiteralExprSyntax.self) {
+            return TypeSyntax(IdentifierTypeSyntax(name: .identifier("Bool")))
+        }
 
         // `Foo()` or `Foo(arg: val)` — FunctionCallExpr with callee being an identifier
         if let call = initializer.as(FunctionCallExprSyntax.self) {

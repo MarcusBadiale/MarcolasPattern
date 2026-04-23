@@ -20,17 +20,16 @@ public struct MCViewMacro: MemberMacro {
             throw MacroError.message("@MCView can only be applied to a struct")
         }
 
-        let viewModelName = extractViewModelName(from: node)
-        let providerName = "_\(viewModelName)Provider"
+        let structName = extractStructName(from: node)
 
         let member: DeclSyntax = """
-        @\(raw: viewModelName).\(raw: providerName) var data
+        @\(raw: structName)._DataWrapper var data
         """
 
         return [member]
     }
 
-    private static func extractViewModelName(from node: AttributeSyntax) -> String {
+    private static func extractStructName(from node: AttributeSyntax) -> String {
         if let arguments = node.arguments,
            case let .argumentList(argList) = arguments,
            let firstArg = argList.first {
@@ -40,6 +39,6 @@ public struct MCViewMacro: MemberMacro {
             }
             return expr
         }
-        return "UnknownViewModel"
+        return "UnknownProvider"
     }
 }

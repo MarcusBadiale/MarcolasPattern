@@ -11,7 +11,7 @@ import SwiftSyntaxMacros
 @main
 struct MarcolasPatternPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
-        MCViewModelMacro.self,
+        MCProviderMacro.self,
         MCViewMacro.self,
     ]
 }

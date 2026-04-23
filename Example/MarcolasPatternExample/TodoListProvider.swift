@@ -1,8 +1,8 @@
 import MarcolasPattern
 import SwiftUI
 
-@MCViewModel
-struct TodoListViewModel {
+@MCProvider
+struct TodoListProvider {
     @State var todos: [Todo] = []
     @State var isLoading: Bool = false
     @State var errorMessage: String? = nil

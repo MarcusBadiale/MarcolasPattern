@@ -8,7 +8,7 @@
 import SwiftUI
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// MARK: - @MCViewModel
+// MARK: - @MCProvider
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 /// Separates logic from UI using a generated DynamicProperty provider.
@@ -22,8 +22,8 @@ import SwiftUI
 ///    SwiftUI automatically tracks @Query/@State/@Environment changes.
 ///
 /// ```swift
-/// @MCViewModel
-/// struct HomeViewModel {
+/// @MCProvider
+/// struct HomeProvider {
 ///     @Query(sort: \Recipe.name) var recipes: [Recipe]
 ///     @State var searchText: String = ""
 ///     @Environment(\.modelContext) var modelContext
@@ -33,22 +33,22 @@ import SwiftUI
 /// }
 /// ```
 @attached(member, names: arbitrary)
-public macro MCViewModel() = #externalMacro(
+public macro MCProvider() = #externalMacro(
     module: "MarcolasPatternMacros",
-    type: "MCViewModelMacro"
+    type: "MCProviderMacro"
 )
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // MARK: - @MCView
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/// Injects a `data` property backed by the ViewModel's DynamicProperty provider.
+/// Injects a `data` property backed by the Provider's DynamicProperty provider.
 ///
-/// The developer writes `body` normally and accesses `data` to get the ViewModel's
+/// The developer writes `body` normally and accesses `data` to get the Provider's
 /// Data struct. No Bridge View, no `ui(data:)` function needed.
 ///
 /// ```swift
-/// @MCView(HomeViewModel.self)
+/// @MCView(HomeProvider.self)
 /// struct HomeView: View {
 ///     var body: some View {
 ///         List(data.filteredRecipes) { recipe in
@@ -61,7 +61,7 @@ public macro MCViewModel() = #externalMacro(
 ///
 /// Generates:
 /// ```swift
-/// @HomeViewModel._HomeViewModelProvider var data
+/// @HomeProvider._DataWrapper var data
 /// ```
 @attached(member, names: named(data))
 public macro MCView<T>(_ viewModel: T.Type) = #externalMacro(
